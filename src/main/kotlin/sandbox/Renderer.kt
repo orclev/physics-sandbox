@@ -6,6 +6,7 @@ import org.lwjgl.glfw.GLFW
 import org.lwjgl.glfw.GLFWErrorCallback
 import org.lwjgl.opengl.GL
 import org.lwjgl.opengl.GL11
+import org.lwjgl.opengl.GL11.*
 import org.lwjgl.opengl.GLCapabilities
 import org.lwjgl.system.MemoryStack
 import org.lwjgl.system.MemoryUtil
@@ -65,9 +66,15 @@ class Renderer<T>(val width: Int, val height: Int, var state: T) : AutoCloseable
     fun loop(render: Renderer<T>.(dt: Double) -> Unit) {
         val caps: GLCapabilities = GL.createCapabilities()
         GL.setCapabilities(caps)
-        caps.
+
         // Set the clear color
-        GL11.glClearColor(1.0f, 0.0f, 0.0f, 0.0f)
+        glMatrixMode(GL_PROJECTION)
+        glLoadIdentity()
+        glOrtho(-400.0,400.0,-300.0,300.0,0.0,1.0)
+
+        glMatrixMode(GL_MODELVIEW)
+        glLoadIdentity()
+        glClearColor(1.0f, 1.0f, 1.0f, 1.0f)
 
         // Run the rendering loop until the user has attempted to close
         // the window or has pressed the ESCAPE key.
@@ -75,7 +82,10 @@ class Renderer<T>(val width: Int, val height: Int, var state: T) : AutoCloseable
         while (!GLFW.glfwWindowShouldClose(window)) {
             GL11.glClear(GL11.GL_COLOR_BUFFER_BIT or GL11.GL_DEPTH_BUFFER_BIT) // clear the framebuffer
 
-            render(GLFW.glfwGetTime())
+            glMatrixMode(GL_MODELVIEW)
+            glLoadIdentity()
+
+            render(GLFW.glfwGetTime() / 10.0)
 
             GLFW.glfwSwapBuffers(window) // swap the color buffers
 

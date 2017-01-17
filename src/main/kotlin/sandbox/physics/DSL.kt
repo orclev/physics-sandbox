@@ -41,7 +41,7 @@ class GameObject : Body() {
      * Only coded for polygons.
      * @param gl the OpenGL graphics context
      */
-    fun render() {
+    fun renderObject() {
         // save the original transform
         glPushMatrix()
 
@@ -198,7 +198,7 @@ class GameWorld(bounds: Bounds) : World(bounds) {
     /** The conversion factor from nano to base  */
     val NANO_TO_BASE = 1.0e9
 
-    fun render() {
+    fun renderWorld() {
         // apply a scaling transformation
         glScaled(SCALE, SCALE, SCALE)
 
@@ -210,7 +210,7 @@ class GameWorld(bounds: Bounds) : World(bounds) {
             // get the object
             val body: GameObject = getBody(i) as GameObject
             // draw the object
-            body.render()
+            body.renderObject()
         }
     }
 }

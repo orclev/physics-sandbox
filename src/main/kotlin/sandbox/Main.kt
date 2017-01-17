@@ -14,7 +14,7 @@ fun main(args: Array<String>) {
     Renderer(640, 480, world).use { r: Renderer<GameWorld> ->
         r.loop { dt: Double ->
             state.updatev(dt)
-            state.render()
+            state.renderWorld()
         }
     }
 }

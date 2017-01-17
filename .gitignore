@@ -2,6 +2,6 @@
 .idea/
 build/
 out/
-phys-sandbox.iml
-phys-sandbox.ipr
-phys-sandbox.iws
+*.iml
+*.ipr
+*.iws
