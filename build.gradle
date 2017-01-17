@@ -1,0 +1,67 @@
+import org.gradle.internal.os.OperatingSystem
+
+buildscript {
+  ext {
+    kotlin_version = "1.0.6"
+    dyn_version = "3.2.3"
+  }
+
+  repositories {
+    mavenCentral()
+    jcenter()
+  }
+
+  dependencies {
+    classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+  }
+}
+switch ( OperatingSystem.current() ) {
+  case OperatingSystem.WINDOWS:
+    project.ext.lwjglNatives = "natives-windows"
+    break
+  case OperatingSystem.LINUX:
+    project.ext.lwjglNatives = "natives-linux"
+    break
+  case OperatingSystem.MAC_OS:
+    project.ext.lwjglNatives = "natives-macos"
+    break
+}
+
+apply plugin: 'kotlin'
+apply plugin: 'idea'
+apply plugin: 'application'
+
+version = '0.1.0'
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+repositories {
+  mavenCentral()
+  jcenter()
+}
+
+dependencies {
+  compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+  compile 'org.jetbrains.kotlinx:kotlinx-support-jdk7:0.3'
+  compile 'org.jetbrains.kotlinx:kotlinx-support-jdk8:0.3'
+  compile "org.dyn4j:dyn4j:$dyn_version"
+  compile "org.lwjgl:lwjgl:3.1.1"
+  compile "org.lwjgl:lwjgl-glfw:3.1.1"
+  compile "org.lwjgl:lwjgl-jemalloc:3.1.1"
+  compile "org.lwjgl:lwjgl-openal:3.1.1"
+  compile "org.lwjgl:lwjgl-opengl:3.1.1"
+  compile "org.lwjgl:lwjgl-stb:3.1.1"
+  runtime "org.lwjgl:lwjgl:3.1.1:${lwjglNatives}"
+  runtime "org.lwjgl:lwjgl-glfw:3.1.1:${lwjglNatives}"
+  runtime "org.lwjgl:lwjgl-jemalloc:3.1.1:${lwjglNatives}"
+  runtime "org.lwjgl:lwjgl-openal:3.1.1:${lwjglNatives}"
+  runtime "org.lwjgl:lwjgl-opengl:3.1.1:${lwjglNatives}"
+  runtime "org.lwjgl:lwjgl-stb:3.1.1:${lwjglNatives}"
+}
+
+task wrapper(type:Wrapper) {
+  gradleVersion = '3.3'
+}
+
+mainClassName = "sandbox.Main"
