@@ -1,4 +1,4 @@
-package sandbox
+package sandbox.graphics
 
 import kotlinx.support.jdk7.use
 import org.lwjgl.glfw.Callbacks
@@ -18,6 +18,7 @@ class Renderer<T>(val width: Int, val height: Int, var state: T) : AutoCloseable
     val window: Long by lazy {
         GLFW.glfwCreateWindow(width, height, "Hello World!", MemoryUtil.NULL, MemoryUtil.NULL)
     }
+    var lastRender: Double = 0.0
     init {
         GLFWErrorCallback.createPrint(System.err).set()
         if ( !GLFW.glfwInit()) {
@@ -61,12 +62,10 @@ class Renderer<T>(val width: Int, val height: Int, var state: T) : AutoCloseable
 
         // Make the window visible
         GLFW.glfwShowWindow(window)
+        GL.createCapabilities()
     }
 
     fun loop(render: Renderer<T>.(dt: Double) -> Unit) {
-        val caps: GLCapabilities = GL.createCapabilities()
-        GL.setCapabilities(caps)
-
         // Set the clear color
         glMatrixMode(GL_PROJECTION)
         glLoadIdentity()
@@ -79,13 +78,16 @@ class Renderer<T>(val width: Int, val height: Int, var state: T) : AutoCloseable
         // Run the rendering loop until the user has attempted to close
         // the window or has pressed the ESCAPE key.
         GLFW.glfwSetTime(0.0)
+        lastRender = 0.0
         while (!GLFW.glfwWindowShouldClose(window)) {
-            GL11.glClear(GL11.GL_COLOR_BUFFER_BIT or GL11.GL_DEPTH_BUFFER_BIT) // clear the framebuffer
+            glClear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT) // clear the framebuffer
 
             glMatrixMode(GL_MODELVIEW)
             glLoadIdentity()
 
-            render(GLFW.glfwGetTime() / 10.0)
+            val now = GLFW.glfwGetTime()
+            render(now - lastRender)
+            lastRender = now
 
             GLFW.glfwSwapBuffers(window) // swap the color buffers
 

@@ -5,9 +5,8 @@ import org.dyn4j.dynamics.Body
 import org.dyn4j.dynamics.BodyFixture
 import org.dyn4j.dynamics.World
 import org.dyn4j.geometry.*
+import org.lwjgl.opengl.*
 import org.lwjgl.opengl.GL11.*
-
-
 
 
 /**

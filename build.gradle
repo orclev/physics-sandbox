@@ -60,6 +60,14 @@ dependencies {
   runtime "org.lwjgl:lwjgl-stb:3.1.1:${lwjglNatives}"
 }
 
+//sourceSets {
+//    main.kotlin.srcDirs += 'src/main/resources'
+//}
+
+processResources {
+  from 'src/main/resources'
+}
+
 task wrapper(type:Wrapper) {
   gradleVersion = '3.3'
 }
