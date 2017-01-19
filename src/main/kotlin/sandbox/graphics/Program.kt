@@ -10,9 +10,11 @@ import java.util.*
 /**
  * Created by Kyle on 2017-01-17.
  */
-class Program private constructor(private val programAttributes: MutableMap<String, Int>): AutoCloseable, Map<String, Int> by programAttributes {
-  constructor() : this(HashMap())
-  private val ident by lazy {
+class Program
+  private constructor(private val programAttributes: MutableMap<String, Attribute>
+      , private val programUniforms: MutableMap<String, Uniform>): AutoCloseable, Map<String, Attribute> by programAttributes {
+  constructor() : this(HashMap(), HashMap())
+  val ident by lazy {
     GL20.glCreateProgram()
   }
   private val attachedShaders: MutableList<Shader> = ArrayList()
@@ -22,8 +24,24 @@ class Program private constructor(private val programAttributes: MutableMap<Stri
     attachedShaders.add(shader)
   }
 
-  fun declareAttribute(name: String) {
-    programAttributes.put(name, -1)
+  fun declareAttribute(name: String, arity: Int) {
+    programAttributes.put(name, Attribute(this, name, arity))
+  }
+
+  fun declareUniform(name: String, size: Int) {
+    programUniforms.put(name, Uniform(this, name, size, false))
+  }
+
+  fun declareMatrixUniform(name: String, size: Int) {
+    programUniforms.put(name, Uniform(this, name, size, true))
+  }
+
+  override fun get(key: String): Attribute {
+    return programAttributes[key] ?: throw IllegalStateException("Attempt to access undefined attribute $key")
+  }
+
+  fun getUniform(key: String): Uniform {
+    return programUniforms[key] ?: throw IllegalStateException("Attempt to access undefined uniform $key")
   }
 
   fun link() {
@@ -33,6 +51,7 @@ class Program private constructor(private val programAttributes: MutableMap<Stri
     }
     detachShaders()
     lookupAttributes()
+    lookupUniforms()
   }
 
   fun isLinked(): Boolean {
@@ -42,12 +61,14 @@ class Program private constructor(private val programAttributes: MutableMap<Stri
   }
 
   private fun lookupAttributes() {
-    for (name: String in programAttributes.keys) {
-      val attrib = GL20.glGetAttribLocation(ident, name)
-      if(attrib == -1) {
-        throw InvalidAttributeException(name)
-      }
-      programAttributes.set(name, attrib)
+    for (attrib in programAttributes.values) {
+      attrib.ident // Force it to not be lazy here
+    }
+  }
+
+  private fun lookupUniforms() {
+    for (uniform in programUniforms.values) {
+      uniform.ident
     }
   }
 
@@ -64,5 +85,4 @@ class Program private constructor(private val programAttributes: MutableMap<Stri
   }
 
   class ProgramLinkException(val log: String): RuntimeException(log)
-  class InvalidAttributeException(val name: String): RuntimeException(name)
 }

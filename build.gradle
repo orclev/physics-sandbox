@@ -4,6 +4,8 @@ buildscript {
   ext {
     kotlin_version = "1.0.6"
     dyn_version = "3.2.3"
+    lwjglVersion = "3.1.1"
+    jomlVersion = "1.9.1"
   }
 
   repositories {
@@ -43,26 +45,24 @@ repositories {
 
 dependencies {
   compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+  compile "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
   compile 'org.jetbrains.kotlinx:kotlinx-support-jdk7:0.3'
   compile 'org.jetbrains.kotlinx:kotlinx-support-jdk8:0.3'
   compile "org.dyn4j:dyn4j:$dyn_version"
-  compile "org.lwjgl:lwjgl:3.1.1"
-  compile "org.lwjgl:lwjgl-glfw:3.1.1"
-  compile "org.lwjgl:lwjgl-jemalloc:3.1.1"
-  compile "org.lwjgl:lwjgl-openal:3.1.1"
-  compile "org.lwjgl:lwjgl-opengl:3.1.1"
-  compile "org.lwjgl:lwjgl-stb:3.1.1"
-  runtime "org.lwjgl:lwjgl:3.1.1:${lwjglNatives}"
-  runtime "org.lwjgl:lwjgl-glfw:3.1.1:${lwjglNatives}"
-  runtime "org.lwjgl:lwjgl-jemalloc:3.1.1:${lwjglNatives}"
-  runtime "org.lwjgl:lwjgl-openal:3.1.1:${lwjglNatives}"
-  runtime "org.lwjgl:lwjgl-opengl:3.1.1:${lwjglNatives}"
-  runtime "org.lwjgl:lwjgl-stb:3.1.1:${lwjglNatives}"
+  compile "org.lwjgl:lwjgl:${lwjglVersion}"
+  compile "org.lwjgl:lwjgl-glfw:${lwjglVersion}"
+  compile "org.lwjgl:lwjgl-jemalloc:${lwjglVersion}"
+  compile "org.lwjgl:lwjgl-openal:${lwjglVersion}"
+  compile "org.lwjgl:lwjgl-opengl:${lwjglVersion}"
+  compile "org.lwjgl:lwjgl-stb:${lwjglVersion}"
+  runtime "org.lwjgl:lwjgl:${lwjglVersion}:${lwjglNatives}"
+  runtime "org.lwjgl:lwjgl-glfw:${lwjglVersion}:${lwjglNatives}"
+  runtime "org.lwjgl:lwjgl-jemalloc:${lwjglVersion}:${lwjglNatives}"
+  runtime "org.lwjgl:lwjgl-openal:${lwjglVersion}:${lwjglNatives}"
+  runtime "org.lwjgl:lwjgl-opengl:${lwjglVersion}:${lwjglNatives}"
+  runtime "org.lwjgl:lwjgl-stb:${lwjglVersion}:${lwjglNatives}"
+  compile "org.joml:joml:${jomlVersion}"
 }
-
-//sourceSets {
-//    main.kotlin.srcDirs += 'src/main/resources'
-//}
 
 processResources {
   from 'src/main/resources'

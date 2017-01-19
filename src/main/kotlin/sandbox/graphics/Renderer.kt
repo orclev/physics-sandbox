@@ -4,19 +4,20 @@ import kotlinx.support.jdk7.use
 import org.lwjgl.glfw.Callbacks
 import org.lwjgl.glfw.GLFW
 import org.lwjgl.glfw.GLFWErrorCallback
-import org.lwjgl.opengl.GL
-import org.lwjgl.opengl.GL11
+import org.lwjgl.opengl.*
 import org.lwjgl.opengl.GL11.*
-import org.lwjgl.opengl.GLCapabilities
 import org.lwjgl.system.MemoryStack
 import org.lwjgl.system.MemoryUtil
 
 /**
  * Created by kyle on 1/16/17.
  */
-class Renderer<T>(val width: Int, val height: Int, var state: T) : AutoCloseable {
+class Renderer<T>(val width: Int, val height: Int, var state: T, private val programInit: () -> Program) : AutoCloseable {
     val window: Long by lazy {
         GLFW.glfwCreateWindow(width, height, "Hello World!", MemoryUtil.NULL, MemoryUtil.NULL)
+    }
+    val program by lazy {
+        programInit()
     }
     var lastRender: Double = 0.0
     init {
@@ -41,7 +42,7 @@ class Renderer<T>(val width: Int, val height: Int, var state: T) : AutoCloseable
             val pWidth = stack.mallocInt(1) // int*
             val pHeight = stack.mallocInt(1) // int*
 
-            // Get the window size passed to glfwCreateWindow
+            // Get the window arity passed to glfwCreateWindow
             GLFW.glfwGetWindowSize(window, pWidth, pHeight)
 
             // Get the resolution of the primary monitor
@@ -63,27 +64,26 @@ class Renderer<T>(val width: Int, val height: Int, var state: T) : AutoCloseable
         // Make the window visible
         GLFW.glfwShowWindow(window)
         GL.createCapabilities()
+        activateProgram()
+    }
+
+    fun activateProgram() {
+        GL20.glUseProgram(program.ident)
+        val buff = GL30.glGenVertexArrays()
+        GL30.glBindVertexArray(buff)
+        GL20.glValidateProgram(program.ident)
+        if (GL20.glGetProgrami(program.ident, GL20.GL_VALIDATE_STATUS) != GL_TRUE) {
+            throw IllegalStateException("GLSL Program failed validation")
+        }
     }
 
     fun loop(render: Renderer<T>.(dt: Double) -> Unit) {
-        // Set the clear color
-        glMatrixMode(GL_PROJECTION)
-        glLoadIdentity()
-        glOrtho(-400.0,400.0,-300.0,300.0,0.0,1.0)
-
-        glMatrixMode(GL_MODELVIEW)
-        glLoadIdentity()
         glClearColor(1.0f, 1.0f, 1.0f, 1.0f)
 
-        // Run the rendering loop until the user has attempted to close
-        // the window or has pressed the ESCAPE key.
         GLFW.glfwSetTime(0.0)
         lastRender = 0.0
         while (!GLFW.glfwWindowShouldClose(window)) {
             glClear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT) // clear the framebuffer
-
-            glMatrixMode(GL_MODELVIEW)
-            glLoadIdentity()
 
             val now = GLFW.glfwGetTime()
             render(now - lastRender)
@@ -91,8 +91,6 @@ class Renderer<T>(val width: Int, val height: Int, var state: T) : AutoCloseable
 
             GLFW.glfwSwapBuffers(window) // swap the color buffers
 
-            // Poll for window events. The key callback above will only be
-            // invoked during this call.
             GLFW.glfwPollEvents()
         }
     }

@@ -18,76 +18,7 @@ fun world(bounds: Bounds, init: GameWorld.() -> Unit): GameWorld {
     return world
 }
 
-class GameObject : Body() {
-    /** The color of the object  */
-    protected var color = FloatArray(4)
-
-    /**
-     * Default constructor.
-     */
-    init {
-        // randomly generate the color
-        this.color[0] = Math.random().toFloat() * 0.5f + 0.5f
-        this.color[1] = Math.random().toFloat() * 0.5f + 0.5f
-        this.color[2] = Math.random().toFloat() * 0.5f + 0.5f
-        this.color[3] = 1.0f
-    }
-
-    /**
-     * Draws the body.
-     *
-     *
-     * Only coded for polygons.
-     * @param gl the OpenGL graphics context
-     */
-    fun renderObject() {
-        // save the original transform
-        glPushMatrix()
-
-        // transform the coordinate system from world coordinates to local coordinates
-        glTranslated(this.transform.translationX, this.transform.translationY, 0.0)
-        // rotate about the z-axis
-        glRotated(Math.toDegrees(this.transform.rotation), 0.0, 0.0, 1.0)
-
-        // loop over all the body fixtures for this body
-        for (fixture in this.fixtures) {
-            // get the shape on the fixture
-            val convex = fixture.shape
-            // check the shape type
-            if (convex is Polygon) {
-                // since Triangle, Rectangle, and Polygon are all of
-                // type Polygon in addition to their main type
-                // set the color
-                glColor4fv(this.color)
-
-                // fill the shape
-                glBegin(GL_POLYGON)
-                for (v in convex.vertices) {
-                    glVertex3d(v.x, v.y, 0.0)
-                }
-                glEnd()
-
-                // set the color
-                glColor4f(this.color[0] * 0.8f, this.color[1] * 0.8f, this.color[2] * 0.8f, 1.0f)
-
-                // draw the shape
-                glBegin(GL_LINE_LOOP)
-                for (v in convex.vertices) {
-                    glVertex3d(v.x, v.y, 0.0)
-                }
-                glEnd()
-            }
-            // circles and other curved shapes require a little more work, so to keep
-            // this example short we only include polygon shapes; see the RenderUtilities
-            // in the Sandbox application
-        }
-
-        // set the original transform
-        glPopMatrix()
-    }
-}
-
-fun GameWorld.floor() {
+fun GameWorld.demo() {
     val floorRect = Rectangle(15.0, 1.0)
     val floor = GameObject()
     floor.addFixture(BodyFixture(floorRect))
@@ -190,26 +121,3 @@ fun GameWorld.floor() {
     this.addBody(slice)
 }
 
-class GameWorld(bounds: Bounds) : World(bounds) {
-    /** The scale 45 pixels per meter  */
-    val SCALE = 45.0
-
-    /** The conversion factor from nano to base  */
-    val NANO_TO_BASE = 1.0e9
-
-    fun renderWorld() {
-        // apply a scaling transformation
-        glScaled(SCALE, SCALE, SCALE)
-
-        // lets move the view up some
-        glTranslated(0.0, -1.0, 0.0)
-
-        // draw all the objects in the world
-        for (i in 0..this.getBodyCount() - 1) {
-            // get the object
-            val body: GameObject = getBody(i) as GameObject
-            // draw the object
-            body.renderObject()
-        }
-    }
-}
